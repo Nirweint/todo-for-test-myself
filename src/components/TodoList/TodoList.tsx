@@ -5,11 +5,14 @@ import {Input} from "../UI/Input";
 
 type TodoListPropsType = {
     tasks: Array<TaskType>
+    id: string
+    title: string
     filter: filterTasksType
-    removeTask: (id: string) => void
-    filterTasks: (value: filterTasksType) => void
-    changeStatus: (taskId: string, isDone: boolean) => void
-    addTask: (title: string) => void
+    removeTask: (id: string, todoListId: string) => void
+    filterTasks: (value: filterTasksType, todoListId: string) => void
+    changeStatus: (taskId: string, isDone: boolean, todoListId: string) => void
+    addTask: (title: string, todoListId: string) => void
+    removeTodoList: (todoListId: string) => void
 }
 
 export const TodoList = (props: TodoListPropsType) => {
@@ -17,15 +20,15 @@ export const TodoList = (props: TodoListPropsType) => {
     let [titleValue, setTitleValue] = useState('')
 
     const removeTaskHandler = (tId: string) => {
-        props.removeTask(tId)
+        props.removeTask(tId, props.id)
     }
     const filterTasksHandler = (value: filterTasksType) => {
-        props.filterTasks(value)
+        props.filterTasks(value, props.id)
     }
     const addTaskHandler = (title: string) => {
         const trimmedTitle = title.trim()
         if (trimmedTitle) {
-            props.addTask(trimmedTitle)
+            props.addTask(trimmedTitle, props.id)
         }
         setTitleValue('')
     }
@@ -34,12 +37,12 @@ export const TodoList = (props: TodoListPropsType) => {
     }
     const addTaskOnEnterHandler = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            props.addTask(titleValue)
+            props.addTask(titleValue, props.id)
             setTitleValue('')
         }
     }
     const onClickChangeStatusHandler = (taskId: string, isDone: boolean) => {
-        props.changeStatus(taskId, isDone)
+        props.changeStatus(taskId, isDone, props.id)
     }
 
     const filterStatusChangeStyle = (filter: filterTasksType) => {
@@ -69,7 +72,10 @@ export const TodoList = (props: TodoListPropsType) => {
 
     return (
         <div>
-            <h3>What to learn</h3>
+            <h3>
+                {props.title}
+                <Button callBack={() => {props.removeTodoList(props.id)}} name={"x"}/>
+            </h3>
             <div>
                 <Input
                     callBack={onInputChangeHandler}
